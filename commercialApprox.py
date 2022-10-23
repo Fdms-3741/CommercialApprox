@@ -5,7 +5,7 @@ class CommercialValueApproximator:
     # Gives tolerances and numbers each series
     tolerances = {6:(0.2,),12:(0.1,),24:(0.05,0.01),48:(0.02,),96:(0.01,),192:(0.005,0.0025,0.001)}
 
-    def __init__(self):
+    def __init__(self,custom=None):
         """ 
         Initializes and calculates the values for each series
         """
@@ -26,6 +26,11 @@ class CommercialValueApproximator:
         
             # Attributes them to their respective series
             self.series[i] = values
+        
+        if custom:
+            self.tolerances['custom'] = (0.00001,)
+            self.series['custom'] = np.array(custom)
+
 
     def _Approx(self,value,floor=True,series=12,checkEqual=True):
         """ 
@@ -33,6 +38,9 @@ class CommercialValueApproximator:
         floor (bool) - If true, rounds down to the nearest value. If false, rounds up
         series - Selects the appropiate series
         """
+        
+        if 'custom' in self.series.keys():
+            series='custom'
 
         magn = np.floor(np.log10(value))
 
@@ -110,5 +118,12 @@ if __name__ == "__main__":
         print(f"{val} -> ",end='')
     print()
     print()
+    
+    del approx
+    approx = CommercialValueApproximator([1,2,3,5,7])
+    print()
+    for i in values:
+        print(f'Exact: {i} / Upper: {approx.Upper(i)} / Approx: {approx.Approx(i)} / Lower: {approx.Lower(i)}')
+        print()
 
-
+    
